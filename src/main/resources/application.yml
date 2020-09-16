@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: heythere-zuul-server
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
+
+zuul:
+  routes:
+    auth-server:
+      path: /auth/**
+      url: http://heythere-auth-server:8082
+    community-server:
+      path: /community/**
+      url: http://heythere-community-server:8081
