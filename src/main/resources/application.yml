@@ -64,3 +64,11 @@ eureka:
     fetch-registry: true
 
     #service-url: http://localhost:8080/eureka
+springdoc:
+  swagger-ui:
+    path: /swagger
+    operations-sorter: method
+  api-docs:
+    enabled: true
+
+
