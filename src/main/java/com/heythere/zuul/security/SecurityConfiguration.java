@@ -89,8 +89,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/swagger-ui/**","/v3/api-docs/**")
                 .permitAll()
-                .antMatchers("/api/community/**", "/community/**")
-                .permitAll()
                 .antMatchers("/",
                         "/error",
                         "/favicon.ico",

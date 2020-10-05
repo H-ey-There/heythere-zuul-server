@@ -1,5 +1,7 @@
 package com.heythere.zuul.user.service;
 
+import com.heythere.zuul.security.exception.ResourceNotFoundException;
+import com.heythere.zuul.security.payload.CurrentUser;
 import com.heythere.zuul.user.model.AuthProvider;
 import com.heythere.zuul.user.model.User;
 import com.heythere.zuul.user.repository.UserRepository;
@@ -28,5 +30,19 @@ public class UserService {
                         .email(payload.getEmail())
                         .password(passwordEncoder.encode(payload.getPassword()))
                         .provider(AuthProvider.LOCAL).build());
+    }
+
+
+    @Transactional
+    public CurrentUser getCurrentUser(final Long id) {
+        final User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User","id",id));
+
+        return CurrentUser.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .img(user.getImageUrl())
+                .build();
     }
 }
