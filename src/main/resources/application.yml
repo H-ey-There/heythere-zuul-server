@@ -39,6 +39,12 @@ zuul:
     heythere-community-server:
       path: /community/**
       url: http://localhost:8081
+    heythere-video-streaming-server:
+      path: /video/**
+      url: http://localhost:8082
+    heythere-mail-server:
+      path: /mail/**
+      url: http://localhost:8083
   prefix: /api
 
 
