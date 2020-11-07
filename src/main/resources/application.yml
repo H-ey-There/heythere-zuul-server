@@ -1,14 +1,35 @@
+
 spring:
   application:
     name: heythere-zuul-server
-  h2:
-    console:
-      enabled: true
-      path: /h2
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    jpa:
+      database: h2
+      database-platform: org.hibernate.dialect.H2Dialect
+      generate-ddl: true
+    h2:
+      console:
+        enabled: true
+        path: /h2
+  kafka:
+    template:
+      default-topic: library-events
+    consumer:
+      bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+    producer:
+      bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+      key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        acks: all
+        retries: 10
+        retry.backoff.ms: 1000
+
   security:
     oauth2:
       client:
@@ -21,6 +42,12 @@ spring:
             scope:
               - email
               - profile
+  servlet:
+    multipart:
+      max-request-size: 1000MB
+      max-file-size: 1000MB
+
+
 
 server:
   port: 8080
@@ -31,7 +58,9 @@ management:
       exposure:
         include: hystrix.stream
 
+
 zuul:
+  ignored-headers: Access-Control-Allow-Credentials, Access-Control-Allow-Origin
   routes:
 #    auth-server:
 #      path: /auth/**
@@ -45,7 +74,16 @@ zuul:
     heythere-mail-server:
       path: /mail/**
       url: http://localhost:8083
+    heythere-user-server:
+      path: /user/**
+      url: http://localhost:8084
+    heythere-chat-room-server:
+      path: /room/**
+      url: http://localhost:8087
   prefix: /api
+  host:
+    connect-timeout-millis: 100000
+    socket-timeout-millis: 100000
 
 
 app:
@@ -58,7 +96,7 @@ app:
     # redirectUri mentioned by the client in the /oauth2/authorize request.
     # We're not using cookies because they won't work well in mobile clients.
     authorizedRedirectUris:
-      - http://localhost:3000/oauth2/redirect
+      - http://localhost:3000/oauth2/redirect4t
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
 
@@ -76,5 +114,3 @@ springdoc:
     operations-sorter: method
   api-docs:
     enabled: true
-
-
