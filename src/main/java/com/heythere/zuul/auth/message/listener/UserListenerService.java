@@ -30,7 +30,7 @@ public class UserListenerService {
     @Transactional
     public void processUpdateUserEvent(final ConsumerRecord<Integer,String> consumerRecord) throws JsonProcessingException {
         final UserEventDto userEvent = objectMapper.readValue(consumerRecord.value(), UserEventDto.class);
-        log.info("libraryEvent : {} ", userEvent);
+        log.info("User  : {} ", userEvent);
 
         if(userEvent.getUserEventId()!=null && userEvent.getUserEventId()==000){
             throw new RecoverableDataAccessException("Temporary Network Issue");
@@ -54,6 +54,7 @@ public class UserListenerService {
         userRepository.deleteById(userEvent.getUserEventId().longValue());
         log.info("User deleted ~ ");
     }
+
     private User save(final UserEventDto userEvent) {
         final UserMessageDto userMessage = userEvent.getUserMessageDto();
 
