@@ -76,7 +76,7 @@ zuul:
       url: http://52.79.235.18:8083
     heythere-user-server:
       path: /user/**
-      url: http://localhost:8084
+      url: http://3.34.99.182:8084
     heythere-chat-room-server:
       path: /room/**
       url: http://localhost:8087
