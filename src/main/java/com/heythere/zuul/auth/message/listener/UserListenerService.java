@@ -31,7 +31,6 @@ public class UserListenerService {
     public void processUpdateUserEvent(final ConsumerRecord<Integer,String> consumerRecord) throws JsonProcessingException {
         final UserEventDto userEvent = objectMapper.readValue(consumerRecord.value(), UserEventDto.class);
         log.info("User  : {} ", userEvent);
-
         if(userEvent.getUserEventId()!=null && userEvent.getUserEventId()==000){
             throw new RecoverableDataAccessException("Temporary Network Issue");
         }
@@ -62,6 +61,7 @@ public class UserListenerService {
                 .id(userEvent.getUserEventId().longValue())
                 .email(userMessage.getEmail())
                 .name(userMessage.getName())
+                .password(userMessage.getPassword())
                 .imageUrl(userMessage.getImg())
                 .provider(AuthProvider.LOCAL)
                 .build());

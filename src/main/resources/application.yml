@@ -1,28 +1,14 @@
-
 spring:
   application:
     name: heythere-zuul-server
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    jpa:
-      database: h2
-      database-platform: org.hibernate.dialect.H2Dialect
-      generate-ddl: true
-    h2:
-      console:
-        enabled: true
-        path: /h2
   kafka:
-    template:
-      default-topic: library-events
     consumer:
-      bootstrap-servers: 3.34.46.47:9092,3.34.46.47:9093,3.34.46.47:9094
+      bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
       key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      group-id: library-events-listener-group
+      group-id: heythere
     producer:
-      bootstrap-servers: 3.34.46.47:9092,3.34.46.47:9093,3.34.46.47:9094
+      bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
       key-serializer: org.apache.kafka.common.serialization.IntegerSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       properties:
@@ -46,6 +32,10 @@ spring:
     multipart:
       max-request-size: 1000MB
       max-file-size: 1000MB
+  h2:
+    console:
+      enabled: true
+      path: /h2
 
 
 
@@ -67,19 +57,16 @@ zuul:
 #      url: http://localhost:8082
     heythere-community-server:
       path: /community/**
-      url: http://15.164.96.218:8081
+      url: http://localhost:8081
     heythere-video-streaming-server:
       path: /video/**
-      url: http://3.34.52.39:8082
+      url: http://localhost:8082
     heythere-mail-server:
       path: /mail/**
-      url: http://52.79.235.18:8083
+      url: http://localhost:8083
     heythere-user-server:
       path: /user/**
-      url: http://3.34.99.182:8084
-    heythere-chat-room-server:
-      path: /room/**
-      url: http://localhost:8087
+      url: http://localhost:8084
   prefix: /api
   host:
     connect-timeout-millis: 100000
@@ -103,7 +90,7 @@ app:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://3.35.49.66:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
 
