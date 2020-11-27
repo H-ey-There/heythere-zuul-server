@@ -74,4 +74,8 @@ public class User extends BaseTimeEntity {
         this.password = message.getPassword();
         return this;
     }
+
+    public void updateImg(String updatedImg) {
+        this.imageUrl = updatedImg;
+    }
 }

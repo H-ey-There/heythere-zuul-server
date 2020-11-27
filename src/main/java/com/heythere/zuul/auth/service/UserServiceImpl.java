@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserEventProducer userEventProducer;
+    private final AmazonS3StorageService amazonS3StorageService;
 
     @Override
     @Transactional
@@ -52,7 +53,13 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserResponseMapper updateImg(Long requestUserId, MultipartFile image) throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        return null;
+        final User user = userRepository.findById(requestUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User","id",requestUserId));
+
+        user.updateImg(amazonS3StorageService.upload(image, user, "profile"));
+
+        userEventProducer.sendUserUpdateEvent(userEventDtoBuilder(user));
+        return UserResponseMapper.of(user);
     }
 
     @Override

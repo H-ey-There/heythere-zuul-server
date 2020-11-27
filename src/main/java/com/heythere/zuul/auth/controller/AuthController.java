@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,12 +48,13 @@ public class AuthController {
 
 
     @PostMapping("register")
-    public ResponseEntity<Long> register(@RequestBody final RegisterUserRequestUserDto payload) {
+    public ResponseEntity<Long> register(@RequestBody final RegisterUserRequestUserDto payload) throws JsonProcessingException {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userService.save(payload));
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") final Long id) throws JsonProcessingException {
         userService.deleteUserById(id);

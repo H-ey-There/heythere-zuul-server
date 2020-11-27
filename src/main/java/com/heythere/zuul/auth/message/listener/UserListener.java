@@ -11,20 +11,5 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class UserListener {
-    private final UserListenerService userListenerService;
 
-    private static final String USER_UPDATE_TOPIC = "user-information-updated";
-    private static final String USER_DELETED = "user-deleted";
-
-    @KafkaListener(topics = {USER_UPDATE_TOPIC}, groupId = "heythere")
-    public void onUserUpdate(final ConsumerRecord<Integer,String> consumerRecord) throws JsonProcessingException {
-        log.info("ConsumerRecord : {} ", consumerRecord );
-        userListenerService.processUpdateUserEvent(consumerRecord);
-    }
-
-    @KafkaListener(topics = {USER_DELETED}, groupId = "heythere")
-    public void onUserDelete(final ConsumerRecord<Integer,String> consumerRecord) throws JsonProcessingException {
-        log.info("ConsumerRecord : {} ", consumerRecord );
-        userListenerService.processDeleteUserEvent(consumerRecord);
-    }
 }
