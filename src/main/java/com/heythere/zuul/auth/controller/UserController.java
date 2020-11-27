@@ -47,9 +47,9 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public UserResponseMapper updateImg(@RequestParam("requestUserId") final Long id,
+    public UserResponseMapper updateImg(@Authentication AuthUser user,
                                         @RequestParam("img") final MultipartFile file) throws InterruptedException, ExecutionException, TimeoutException, IOException {
-        return userService.updateImg(id, file);
+        return userService.updateImg(user.getId(), file);
     }
 
 }

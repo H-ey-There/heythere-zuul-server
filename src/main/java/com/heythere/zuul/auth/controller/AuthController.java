@@ -2,6 +2,7 @@ package com.heythere.zuul.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.heythere.zuul.auth.dto.RegisterUserRequestUserDto;
+import com.heythere.zuul.auth.security.AuthUser;
 import com.heythere.zuul.auth.security.jwt.TokenProvider;
 import com.heythere.zuul.auth.security.payload.*;
 import com.heythere.zuul.auth.service.UserService;
@@ -14,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,7 +27,6 @@ import javax.validation.Valid;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final TokenProvider tokenProvider;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
     @PostMapping("login")
@@ -55,9 +54,9 @@ public class AuthController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @DeleteMapping("user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") final Long id) throws JsonProcessingException {
-        userService.deleteUserById(id);
+    @DeleteMapping("delete")
+    public ResponseEntity<?> deleteUser(@com.heythere.zuul.auth.security.Authentication final AuthUser authUser) throws JsonProcessingException {
+        userService.deleteUserById(authUser.getId());
         return ResponseEntity.status(200).body("user delete successfully!");
     }
 }

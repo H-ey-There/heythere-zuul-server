@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heythere.zuul.auth.message.domain.MailEventDto;
 import com.heythere.zuul.auth.message.domain.UserEventDto;
+import com.heythere.zuul.auth.message.domain.community.CommunityPostUploadSendEventDto;
+import com.heythere.zuul.auth.message.domain.live.LiveStreamingSendEventDto;
+import com.heythere.zuul.auth.message.domain.video.VideoUploadSendEventDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -42,6 +45,72 @@ public class UserEventProducer {
             "user-deleted-realtime-server"
     );
 
+    private static final String VIDEO_UPLOAD = "video-upload";
+    private static final String COMMUNITY_POST_UPLOAD = "community-upload";
+
+    public void sendVideoUploadEvent(final VideoUploadSendEventDto message) throws JsonProcessingException {
+        final Integer key = message.getUserId();
+        final String value = objectMapper.writeValueAsString(message);
+
+        final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, VIDEO_UPLOAD);
+
+        final ListenableFuture<SendResult<Integer, String>> listenableFuture
+                = kafkaTemplate.send(producerRecord);
+        listenableFuture.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(final Throwable ex) {
+                handleFailure(key, value, ex);
+            }
+
+            @Override
+            public void onSuccess(final SendResult<Integer,String> result) {
+                handleSuccess(key, value, result);
+            }
+        });
+    }
+
+    public void sendCommunityPostUploadEvent(final CommunityPostUploadSendEventDto message) throws JsonProcessingException {
+        final Integer key = message.getUserId();
+        final String value = objectMapper.writeValueAsString(message);
+
+        final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, COMMUNITY_POST_UPLOAD);
+
+        final ListenableFuture<SendResult<Integer, String>> listenableFuture
+                = kafkaTemplate.send(producerRecord);
+        listenableFuture.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(final Throwable ex) {
+                handleFailure(key, value, ex);
+            }
+
+            @Override
+            public void onSuccess(final SendResult<Integer,String> result) {
+                handleSuccess(key, value, result);
+            }
+        });
+    }
+
+    public void sendLiveStreamingStartEvent(final LiveStreamingSendEventDto message) throws JsonProcessingException {
+        final Integer key = message.getUserId();
+        final String value = objectMapper.writeValueAsString(message);
+
+        final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, COMMUNITY_POST_UPLOAD);
+
+        final ListenableFuture<SendResult<Integer, String>> listenableFuture
+                = kafkaTemplate.send(producerRecord);
+        listenableFuture.addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(final Throwable ex) {
+                handleFailure(key, value, ex);
+            }
+
+            @Override
+            public void onSuccess(final SendResult<Integer,String> result) {
+                handleSuccess(key, value, result);
+            }
+        });
+    }
+
     public void sendUserUpdateEvent(final UserEventDto userMessage) throws JsonProcessingException {
         for (final String EVENT_NAME : USER_GENERATE_EVENTS) {
             final Integer key = userMessage.getUserEventId();
@@ -50,7 +119,6 @@ public class UserEventProducer {
             final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, EVENT_NAME);
 
             final ListenableFuture<SendResult<Integer, String>> listenableFuture
-                    // = kafkaTemplate.send(topic,key, value);
                     = kafkaTemplate.send(producerRecord);
             listenableFuture.addCallback(new ListenableFutureCallback<>() {
                 @Override
@@ -74,7 +142,6 @@ public class UserEventProducer {
             final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, EVENT_NAME);
 
             final ListenableFuture<SendResult<Integer, String>> listenableFuture
-                    // = kafkaTemplate.send(topic,key, value);
                     = kafkaTemplate.send(producerRecord);
             listenableFuture.addCallback(new ListenableFutureCallback<>() {
                 @Override

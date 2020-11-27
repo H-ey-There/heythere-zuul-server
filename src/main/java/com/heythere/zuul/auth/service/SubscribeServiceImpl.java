@@ -1,6 +1,5 @@
 package com.heythere.zuul.auth.service;
 
-import com.heythere.zuul.auth.dto.SubscribeRequestDto;
 import com.heythere.zuul.auth.mapper.SubscribeStatusResponseMapper;
 import com.heythere.zuul.auth.mapper.UserResponseMapper;
 import com.heythere.zuul.auth.model.Subscriber;
@@ -22,42 +21,44 @@ public class SubscribeServiceImpl implements SubscribeService {
     private final UserRepository userRepository;
     @Override
     @Transactional
-    public SubscribeStatusResponseMapper subscribeStatus(final SubscribeRequestDto payload) {
+    public SubscribeStatusResponseMapper subscribeStatus(final Long requestUserId,
+                                                         final Long targetUserId) {
 
         return SubscribeStatusResponseMapper
                 .builder()
-                .subscriberId(payload.getRequestUserId())
-                .targetUserId(payload.getTargetUserId())
-                .subscribe(getCurrentSubscribeStatus(payload))
+                .subscriberId(requestUserId)
+                .targetUserId(targetUserId)
+                .subscribe(getCurrentSubscribeStatus(requestUserId, targetUserId))
                 .build();
     }
 
     @Override
     @Transactional
-    public SubscribeStatusResponseMapper subscribeButtonClick(final SubscribeRequestDto payload) {
-        final Boolean status = getCurrentSubscribeStatus(payload);
+    public SubscribeStatusResponseMapper subscribeButtonClick(final Long requestUserId,
+                                                              final Long targetUserId) {
+        final Boolean status = getCurrentSubscribeStatus(requestUserId, targetUserId);
 
         if (!status) {
             subscriberRepository.save(
                     Subscriber.builder()
-                    .subscriberUserId(payload.getRequestUserId())
-                    .targetUserId(payload.getTargetUserId())
+                    .subscriberUserId(requestUserId)
+                    .targetUserId(targetUserId)
                     .build());
             return SubscribeStatusResponseMapper
                     .builder()
-                    .subscriberId(payload.getRequestUserId())
-                    .targetUserId(payload.getTargetUserId())
+                    .subscriberId(requestUserId)
+                    .targetUserId(targetUserId)
                     .subscribe(true).build();
         }
 
         subscriberRepository.deleteById(
-                subscriberRepository.getSubscriberMappingId(payload.getRequestUserId(), payload.getTargetUserId())
+                subscriberRepository.getSubscriberMappingId(requestUserId, targetUserId)
         );
 
         return SubscribeStatusResponseMapper
                 .builder()
-                .subscriberId(payload.getRequestUserId())
-                .targetUserId(payload.getTargetUserId())
+                .subscriberId(requestUserId)
+                .targetUserId(targetUserId)
                 .subscribe(false).build();
     }
 
@@ -75,7 +76,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
 
-    private Boolean getCurrentSubscribeStatus(final SubscribeRequestDto payload) {
-        return subscriberRepository.existsBySubscriberUserIdAndAndTargetUserId(payload.getRequestUserId(), payload.getTargetUserId());
+    private Boolean getCurrentSubscribeStatus(final Long requestUserId, final Long targetUserId) {
+        return subscriberRepository.existsBySubscriberUserIdAndAndTargetUserId(requestUserId, targetUserId);
     }
 }

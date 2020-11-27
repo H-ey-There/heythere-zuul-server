@@ -1,10 +1,12 @@
 package com.heythere.zuul.auth.controller;
 
-import com.heythere.zuul.auth.dto.SubscribeRequestDto;
 import com.heythere.zuul.auth.mapper.SubscribeStatusResponseMapper;
 import com.heythere.zuul.auth.mapper.UserResponseMapper;
+import com.heythere.zuul.auth.security.AuthUser;
+import com.heythere.zuul.auth.security.Authentication;
 import com.heythere.zuul.auth.service.SubscribeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,19 +17,24 @@ import java.util.List;
 public class SubscribeController {
     private final SubscribeService subscribeService;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("subscribe")
-    public SubscribeStatusResponseMapper subscribeButtonClick(final SubscribeRequestDto payload) {
-        return subscribeService.subscribeButtonClick(payload);
+    public SubscribeStatusResponseMapper subscribeButtonClick(@Authentication final AuthUser authUser,
+                                                              @RequestParam("targetId") final Long targetId) {
+        return subscribeService.subscribeButtonClick(authUser.getId(), targetId);
     }
 
-    @PostMapping("subscribe/status")
-    public SubscribeStatusResponseMapper subscribeStatus(final SubscribeRequestDto payload) {
-        return subscribeService.subscribeStatus(payload);
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("subscribe/status")
+    public SubscribeStatusResponseMapper subscribeStatus(@Authentication final AuthUser authUser,
+                                                         @RequestParam("targetId") final Long targetId) {
+        return subscribeService.subscribeStatus(authUser.getId(), targetId);
     }
 
-    @GetMapping("me/{id}/subscribers")
-    public List<UserResponseMapper> retrieveAllMySubscriber(@PathVariable("id") final Long id) {
-        return subscribeService.retrieveAllMySubscriber(id);
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("subscribers")
+    public List<UserResponseMapper> retrieveAllMySubscriber(@Authentication final AuthUser authUser) {
+        return subscribeService.retrieveAllMySubscriber(authUser.getId());
     }
 
 
