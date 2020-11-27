@@ -2,7 +2,6 @@ package com.heythere.zuul.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.heythere.zuul.auth.dto.RegisterUserRequestUserDto;
-import com.heythere.zuul.auth.repository.UserRepository;
 import com.heythere.zuul.auth.security.jwt.TokenProvider;
 import com.heythere.zuul.auth.security.payload.*;
 import com.heythere.zuul.auth.service.UserService;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@CrossOrigin("*")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
