@@ -27,52 +27,67 @@ public class UserEventProducer {
     private final KafkaTemplate<Integer, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String USER_UPDATE_TOPIC = "user-information-updated";
-    private static final String USER_DELETED = "user-deleted";
     private static final String SEND_WELCOME_MAIL = "send-welcome-mail";
+    private static final List<String> USER_GENERATE_EVENTS = List.of(
+            "user-generate-video-server",
+            "user-generate-zuul-server",
+            "user-generate-community-server",
+            "user-generate-realtime-server"
+    );
+
+    private static final List<String> USER_DELETED_EVENTS = List.of(
+            "user-deleted-video-server",
+            "user-deleted-zuul-server",
+            "user-deleted-community-server",
+            "user-deleted-realtime-server"
+    );
 
     public void sendUserUpdateEvent(final UserEventDto userMessage) throws JsonProcessingException {
-        final Integer key = userMessage.getUserEventId();
-        final String value = objectMapper.writeValueAsString(userMessage);
+        for (final String EVENT_NAME : USER_GENERATE_EVENTS) {
+            final Integer key = userMessage.getUserEventId();
+            final String value = objectMapper.writeValueAsString(userMessage);
 
-        final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, USER_UPDATE_TOPIC);
+            final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, EVENT_NAME);
 
-        final ListenableFuture<SendResult<Integer, String>> listenableFuture
-                // = kafkaTemplate.send(topic,key, value);
-                = kafkaTemplate.send(producerRecord);
-        listenableFuture.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(final Throwable ex) {
-                handleFailure(key, value, ex);
-            }
+            final ListenableFuture<SendResult<Integer, String>> listenableFuture
+                    // = kafkaTemplate.send(topic,key, value);
+                    = kafkaTemplate.send(producerRecord);
+            listenableFuture.addCallback(new ListenableFutureCallback<>() {
+                @Override
+                public void onFailure(final Throwable ex) {
+                    handleFailure(key, value, ex);
+                }
 
-            @Override
-            public void onSuccess(final SendResult<Integer,String> result) {
-                handleSuccess(key, value, result);
-            }
-        });
+                @Override
+                public void onSuccess(final SendResult<Integer,String> result) {
+                    handleSuccess(key, value, result);
+                }
+            });
+        }
     }
 
     public void sendUserDeletedEvent(final UserEventDto userMessage) throws JsonProcessingException {
-        final Integer key = userMessage.getUserEventId();
-        final String value = objectMapper.writeValueAsString(userMessage);
+        for( final String EVENT_NAME : USER_DELETED_EVENTS) {
+            final Integer key = userMessage.getUserEventId();
+            final String value = objectMapper.writeValueAsString(userMessage);
 
-        final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, USER_DELETED);
+            final ProducerRecord<Integer, String> producerRecord = buildProducerRecord(key, value, EVENT_NAME);
 
-        final ListenableFuture<SendResult<Integer, String>> listenableFuture
-                // = kafkaTemplate.send(topic,key, value);
-                = kafkaTemplate.send(producerRecord);
-        listenableFuture.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(final Throwable ex) {
-                handleFailure(key, value, ex);
-            }
+            final ListenableFuture<SendResult<Integer, String>> listenableFuture
+                    // = kafkaTemplate.send(topic,key, value);
+                    = kafkaTemplate.send(producerRecord);
+            listenableFuture.addCallback(new ListenableFutureCallback<>() {
+                @Override
+                public void onFailure(final Throwable ex) {
+                    handleFailure(key, value, ex);
+                }
 
-            @Override
-            public void onSuccess(final SendResult<Integer,String> result) {
-                handleSuccess(key, value, result);
-            }
-        });
+                @Override
+                public void onSuccess(final SendResult<Integer,String> result) {
+                    handleSuccess(key, value, result);
+                }
+            });
+        }
     }
 
     public void sendWelcomeMailEvent(final MailEventDto mailEvent) throws JsonProcessingException {

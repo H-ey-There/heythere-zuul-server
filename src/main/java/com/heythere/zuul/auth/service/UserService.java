@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 public interface UserService {
-    Long save(final RegisterUserRequestUserDto payload);
+    Long save(final RegisterUserRequestUserDto payload) throws JsonProcessingException;
     UserResponseMapper findUserById(final Long requestUserId);
     UserResponseMapper updateImg(final Long requestUserId, final MultipartFile image) throws IOException, InterruptedException, ExecutionException, TimeoutException;
     void deleteUserById(final Long requestUserId) throws JsonProcessingException;

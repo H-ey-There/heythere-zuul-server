@@ -3,6 +3,10 @@ package com.heythere.zuul.auth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.heythere.zuul.auth.dto.RegisterUserRequestUserDto;
 import com.heythere.zuul.auth.mapper.UserResponseMapper;
+import com.heythere.zuul.auth.message.domain.MailEventDto;
+import com.heythere.zuul.auth.message.domain.UserEventDto;
+import com.heythere.zuul.auth.message.domain.UserMessageDto;
+import com.heythere.zuul.auth.message.sender.UserEventProducer;
 import com.heythere.zuul.auth.model.User;
 import com.heythere.zuul.auth.repository.UserRepository;
 import com.heythere.zuul.auth.security.exception.ResourceNotFoundException;
@@ -21,15 +25,21 @@ import java.util.concurrent.TimeoutException;
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserEventProducer userEventProducer;
 
     @Override
     @Transactional
-    public Long save(RegisterUserRequestUserDto payload) {
-        return userRepository.save(User.builder()
+    public Long save(RegisterUserRequestUserDto payload) throws JsonProcessingException {
+        final User user = userRepository.save(User.builder()
                 .email(payload.getEmail())
                 .name(payload.getName())
                 .password(passwordEncoder.encode(payload.getPassword()))
-                .build()).getId();
+                .build());
+
+        userEventProducer.sendWelcomeMailEvent(mailEventDtoBuilder(user));
+        userEventProducer.sendUserUpdateEvent(userEventDtoBuilder(user));
+
+        return user.getId();
     }
 
     @Override
@@ -49,5 +59,27 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public void deleteUserById(Long requestUserId) throws JsonProcessingException {
         userRepository.deleteById(requestUserId);
+    }
+
+    private UserEventDto userEventDtoBuilder(final User user) {
+        final UserMessageDto userMessage = UserMessageDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .password(user.getPassword())
+                .img(user.getImageUrl())
+                .build();
+
+        return UserEventDto.builder()
+                .userEventId(user.getId().intValue())
+                .userMessageDto(userMessage)
+                .build();
+    }
+
+    private MailEventDto mailEventDtoBuilder(final User user) {
+        return MailEventDto.builder()
+                .userId(user.getId().intValue())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
     }
 }
