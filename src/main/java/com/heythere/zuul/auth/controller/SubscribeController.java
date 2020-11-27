@@ -18,7 +18,7 @@ public class SubscribeController {
     private final SubscribeService subscribeService;
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("subscribe")
+    @GetMapping("subscribe")
     public SubscribeStatusResponseMapper subscribeButtonClick(@Authentication final AuthUser authUser,
                                                               @RequestParam("targetId") final Long targetId) {
         return subscribeService.subscribeButtonClick(authUser.getId(), targetId);
@@ -36,6 +36,4 @@ public class SubscribeController {
     public List<UserResponseMapper> retrieveAllMySubscriber(@Authentication final AuthUser authUser) {
         return subscribeService.retrieveAllMySubscriber(authUser.getId());
     }
-
-
 }

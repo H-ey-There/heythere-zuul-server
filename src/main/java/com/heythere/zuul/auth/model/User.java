@@ -32,7 +32,6 @@ public class User extends BaseTimeEntity {
 
     private String imageUrl;
 
-    @Column(nullable = true)
     private Boolean emailVerified = false;
 
     @JsonIgnore
@@ -42,7 +41,7 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
-    @Column(nullable = true)
+
     private String providerId;
 
     @Builder

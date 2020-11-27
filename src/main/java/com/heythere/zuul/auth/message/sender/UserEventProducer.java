@@ -33,14 +33,12 @@ public class UserEventProducer {
     private static final String SEND_WELCOME_MAIL = "send-welcome-mail";
     private static final List<String> USER_GENERATE_EVENTS = List.of(
             "user-generate-video-server",
-            "user-generate-zuul-server",
             "user-generate-community-server",
             "user-generate-realtime-server"
     );
 
     private static final List<String> USER_DELETED_EVENTS = List.of(
             "user-deleted-video-server",
-            "user-deleted-zuul-server",
             "user-deleted-community-server",
             "user-deleted-realtime-server"
     );

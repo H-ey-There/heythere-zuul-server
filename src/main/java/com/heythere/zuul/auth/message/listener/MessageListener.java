@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageListener {
     private static final String VIDEO_UPLOAD = "video-upload";
-    private static final String COMMUNITY_POST_UPLOAD = "community_post_upload";
-    private static final String LIVE_STREAMING_START = "live_streaming_start";
+    private static final String COMMUNITY_POST_UPLOAD = "community-post_upload";
+    private static final String LIVE_STREAMING_START = "live-streaming_start";
 
     private final MessageListenerService messageListenerService;
 

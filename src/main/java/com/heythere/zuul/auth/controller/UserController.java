@@ -45,7 +45,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping
+    @PostMapping("upload/profile")
     @PreAuthorize("hasRole('USER')")
     public UserResponseMapper updateImg(@Authentication AuthUser user,
                                         @RequestParam("img") final MultipartFile file) throws InterruptedException, ExecutionException, TimeoutException, IOException {

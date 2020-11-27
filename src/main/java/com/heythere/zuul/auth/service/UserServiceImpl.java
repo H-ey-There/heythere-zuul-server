@@ -7,6 +7,7 @@ import com.heythere.zuul.auth.message.domain.MailEventDto;
 import com.heythere.zuul.auth.message.domain.UserEventDto;
 import com.heythere.zuul.auth.message.domain.UserMessageDto;
 import com.heythere.zuul.auth.message.sender.UserEventProducer;
+import com.heythere.zuul.auth.model.AuthProvider;
 import com.heythere.zuul.auth.model.User;
 import com.heythere.zuul.auth.repository.UserRepository;
 import com.heythere.zuul.auth.security.exception.ResourceNotFoundException;
@@ -35,6 +36,9 @@ public class UserServiceImpl implements UserService{
                 .email(payload.getEmail())
                 .name(payload.getName())
                 .password(passwordEncoder.encode(payload.getPassword()))
+                .provider(AuthProvider.LOCAL)
+                .emailVerified(false)
+                .providerId("LOCAL")
                 .build());
 
         userEventProducer.sendWelcomeMailEvent(mailEventDtoBuilder(user));
@@ -44,17 +48,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional
-    public UserResponseMapper findUserById(Long requestUserId) {
-        return UserResponseMapper.of(
-                userRepository.findById(requestUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", requestUserId)));
-    }
-
-    @Override
     public UserResponseMapper updateImg(Long requestUserId, MultipartFile image) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         final User user = userRepository.findById(requestUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User","id",requestUserId));
+                .orElseThrow(() -> new ResourceNotFoundException("User","id", requestUserId));
 
         user.updateImg(amazonS3StorageService.upload(image, user, "profile"));
 
